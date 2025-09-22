@@ -1,7 +1,7 @@
 ﻿# Sanesh – Developer Portfolio
-live views how it actually look like click hear : https://sanesh764.github.io/Github_portfolio/
 A clean, responsive portfolio to showcase projects, skills, and contact information.
 
+live views how it actually look like click hear : https://sanesh764.github.io/Github_portfolio/
 ## ✨ Highlights
 - Responsive layout with modern UI (animated gradient hero, cards, subtle shadows)
 - Light/Dark theme toggle with smooth transitions
@@ -65,5 +65,6 @@ portfolio/
 
 ## 📄 License
 This project is open for personal learning and portfolio use. Feel free to fork and adapt.
+
 
 
