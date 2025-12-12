@@ -65,9 +65,12 @@ function observeElements() {
     const fadeElements = document.querySelectorAll('.fade-in, .scroll-reveal');
 
     const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+                // Stagger animation for project cards
+                setTimeout(() => {
+                    entry.target.classList.add('visible');
+                }, index * 100);
             }
         });
     }, {
@@ -86,13 +89,9 @@ function handleNavbarScroll() {
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            navbar.style.background = body.getAttribute('data-theme') === 'dark'
-                ? 'rgba(15, 23, 42, 0.98)'
-                : 'rgba(255, 255, 255, 0.98)';
+            navbar.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
         } else {
-            navbar.style.background = body.getAttribute('data-theme') === 'dark'
-                ? 'rgba(15, 23, 42, 0.95)'
-                : 'rgba(255, 255, 255, 0.95)';
+            navbar.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
         }
     });
 }
@@ -109,7 +108,8 @@ function handleContactForm() {
         const email = formData.get('email');
         const message = formData.get('message');
 
-        alert('Thank you for your message! I\'ll get back to you soon.');
+        // Enhanced feedback
+        alert(`Thank you for your message, ${name}! I'll get back to you at ${email} soon.`);
         form.reset();
     });
 }
@@ -118,25 +118,50 @@ function handleContactForm() {
 function handleAddProject() {
     const addProjectCard = document.querySelector('.add-project-card');
 
-    addProjectCard.addEventListener('click', () => {
-        alert('This would open a form to add a new project. In a real implementation, this could connect to a CMS or admin panel.');
-    });
+    if (addProjectCard) {
+        addProjectCard.addEventListener('click', () => {
+            alert('This would open a form to add a new project. In a real implementation, this could connect to a CMS or admin panel.');
+        });
+    }
 }
 
-// Typing animation
+// Enhanced typing animation with multiple phrases
 function typeWriter() {
     const subtitle = document.querySelector('.hero-content .subtitle');
-    const text = "B.Tech CSE Student | Future Developer";
-    subtitle.textContent = '';
+    if (!subtitle) return;
 
-    let i = 0;
+    const phrases = [
+        "B.Tech CSE Student | Future Developer",
+        "Full Stack Developer | Problem Solver",
+        "AI Enthusiast | Creative Coder"
+    ];
+    let phraseIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+
     function type() {
-        if (i < text.length) {
-            subtitle.textContent += text.charAt(i);
-            i++;
-            setTimeout(type, 100);
+        const currentPhrase = phrases[phraseIndex];
+
+        if (isDeleting) {
+            subtitle.textContent = currentPhrase.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            subtitle.textContent = currentPhrase.substring(0, charIndex + 1);
+            charIndex++;
         }
+
+        if (!isDeleting && charIndex === currentPhrase.length) {
+            // Pause at end of phrase
+            setTimeout(() => { isDeleting = true; }, 2000);
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+        }
+
+        const typingSpeed = isDeleting ? 50 : 100;
+        setTimeout(type, typingSpeed);
     }
+
     setTimeout(type, 1000);
 }
 
@@ -166,6 +191,18 @@ function highlightActiveSection() {
     });
 }
 
+// Parallax effect on hero section
+function initParallax() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallaxSpeed = 0.5;
+        hero.style.transform = `translateY(${scrolled * parallaxSpeed}px)`;
+    });
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     observeElements();
@@ -174,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     handleAddProject();
     typeWriter();
     highlightActiveSection();
+    initParallax();
 });
 
 // Preloader
@@ -185,19 +223,21 @@ window.addEventListener('load', () => {
 // Floating particles
 function createParticles() {
     const hero = document.querySelector('.hero');
-    const particleCount = 50;
+    if (!hero) return;
+
+    const particleCount = 30;
 
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'particle';
         particle.style.cssText = `
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--primary-color);
+            width: ${Math.random() * 3 + 1}px;
+            height: ${Math.random() * 3 + 1}px;
+            background: rgba(255, 255, 255, ${Math.random() * 0.5 + 0.3});
             border-radius: 50%;
-            opacity: 0.3;
-            animation: float ${Math.random() * 3 + 2}s ease-in-out infinite;
+            opacity: 0.6;
+            animation: float ${Math.random() * 4 + 3}s ease-in-out infinite;
             left: ${Math.random() * 100}%;
             top: ${Math.random() * 100}%;
             animation-delay: ${Math.random() * 2}s;
@@ -205,3 +245,30 @@ function createParticles() {
         hero.appendChild(particle);
     }
 }
+
+// Smooth scroll progress indicator
+function createScrollProgress() {
+    const progressBar = document.createElement('div');
+    progressBar.id = 'scroll-progress';
+    progressBar.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #06b6d4, #a855f7);
+        z-index: 9999;
+        transition: width 0.2s ease;
+    `;
+    document.body.appendChild(progressBar);
+
+    window.addEventListener('scroll', () => {
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        progressBar.style.width = scrolled + '%';
+    });
+}
+
+// Initialize scroll progress indicator
+document.addEventListener('DOMContentLoaded', createScrollProgress);
